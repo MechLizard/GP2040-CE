@@ -123,6 +123,13 @@ void Storage::nextProfile()
 {
     this->config.gamepadOptions.profileNumber = (this->config.gamepadOptions.profileNumber % 4) + 1;
 }
+void Storage::previousProfile()
+{
+	if (this->config.gamepadOptions.profileNumber == 1)
+		this->config.gamepadOptions.profileNumber = 4;
+	else
+		this->config.gamepadOptions.profileNumber -= 1;
+}
 
 void Storage::setFunctionalPinMappings()
 {
@@ -141,9 +148,9 @@ void Storage::setFunctionalPinMappings()
 				alts[pin].action != GpioAction::ASSIGNED_TO_ADDON &&
 				this->config.gpioMappings.pins[pin].action != GpioAction::RESERVED &&
 				this->config.gpioMappings.pins[pin].action != GpioAction::ASSIGNED_TO_ADDON) {
-			functionalPinMappings[pin] = alts[pin].action;
+			functionalPinMappings[pin] = alts[pin];
 		} else {
-			functionalPinMappings[pin] = this->config.gpioMappings.pins[pin].action;
+			functionalPinMappings[pin] = this->config.gpioMappings.pins[pin];
 		}
 	}
 }
@@ -176,21 +183,6 @@ void Storage::SetProcessedGamepad(Gamepad * newpad)
 Gamepad * Storage::GetProcessedGamepad()
 {
 	return processedGamepad;
-}
-
-void Storage::SetFeatureData(uint8_t * newData)
-{
-	memcpy(newData, featureData, sizeof(uint8_t)*sizeof(featureData));
-}
-
-void Storage::ClearFeatureData()
-{
-	memset(featureData, 0, sizeof(uint8_t)*sizeof(featureData));
-}
-
-uint8_t * Storage::GetFeatureData()
-{
-	return featureData;
 }
 
 /* Animation stuffs */

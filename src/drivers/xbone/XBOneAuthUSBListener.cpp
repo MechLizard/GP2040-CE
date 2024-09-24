@@ -29,6 +29,8 @@ static uint32_t lastReportQueue = 0;
 
 void XBOneAuthUSBListener::setup() {
     xboxOneAuthData = nullptr;
+    xbone_dev_addr = 0;
+    xbone_instance = 0;
 }
 
 void XBOneAuthUSBListener::setAuthData(XboxOneAuthData * authData ) {
@@ -88,7 +90,7 @@ void XBOneAuthUSBListener::unmount(uint8_t dev_addr) {
 }
 
 void XBOneAuthUSBListener::report_received(uint8_t dev_addr, uint8_t instance, uint8_t const* report, uint16_t len) {
-    if ( mounted == false || xboxOneAuthData == nullptr || dev_addr != xbone_dev_addr) {
+    if ( mounted == false || xboxOneAuthData == nullptr || dev_addr != xbone_dev_addr || instance != xbone_instance ) {
         return;
     }
 
@@ -111,7 +113,7 @@ void XBOneAuthUSBListener::report_received(uint8_t dev_addr, uint8_t instance, u
             queue_host_report((uint8_t*)outgoingXGIP.generatePacket(), outgoingXGIP.getPacketLength());
             break;
         case GIP_DEVICE_DESCRIPTOR:
-            if ( incomingXGIP.endOfChunk() == true ) {
+            if ( incomingXGIP.endOfChunk() == true && xboxOneAuthData->dongle_ready != true) {
                 outgoingXGIP.reset();  // Power-on full string
                 outgoingXGIP.setAttributes(GIP_POWER_MODE_DEVICE_CONFIG, 2, 1, false, 0);
                 outgoingXGIP.setData(xb1_power_on, sizeof(xb1_power_on));
